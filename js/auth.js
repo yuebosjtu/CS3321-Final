@@ -26,30 +26,30 @@ function login() {
     const username = document.getElementById('login-username').value.trim();
     const password = document.getElementById('login-password').value.trim();
     const role = document.getElementById('login-role').value;
-    
-    // 简单验证
-    if (!username || !password) {
-        showNotification('请输入用户名和密码', 'error');
-        return;
-    }
-    
-    // 模拟登录 - 实际应用中这里应该是API调用
-    if (username === 'admin' && password === 'admin123' && role === 'admin') {
-        // 管理员登录成功
+
+    // 从 localStorage 获取已注册用户
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+
+    // 检查用户是否存在
+    const user = registeredUsers.find(u => 
+        u.username === username && 
+        u.password === password && 
+        u.role === role
+    );
+
+    if (user) {
+        // 登录成功
         localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userRole', 'admin');
+        localStorage.setItem('userRole', role);
         localStorage.setItem('username', username);
-        showAdminDashboard();
-        showNotification('管理员登录成功');
-    } else if (username === 'visitor' && password === 'visitor123' && role === 'visitor') {
-        // 游客登录成功
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userRole', 'visitor');
-        localStorage.setItem('username', username);
-        showVisitorDashboard();
-        showNotification('游客登录成功');
+        
+        if (role === 'admin') {
+            showAdminDashboard();
+        } else {
+            showVisitorDashboard();
+        }
+        showNotification('登录成功');
     } else {
-        // 登录失败
         showNotification('用户名或密码错误', 'error');
     }
 }
